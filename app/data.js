@@ -5,6 +5,7 @@ import cohorts from '../.data/cohorts.json' with { type: 'json' }
 import moves from '../.data/moves.json' with { type: 'json' }
 import notices from '../.data/notices.json' with { type: 'json' }
 import organisations from '../.data/organisations.json' with { type: 'json' }
+import parents from '../.data/parents.json' with { type: 'json' }
 import patients from '../.data/patients.json' with { type: 'json' }
 import patientSessions from '../.data/patient-sessions.json' with { type: 'json' }
 import programmes from '../.data/programmes.json' with { type: 'json' }
@@ -36,6 +37,7 @@ export default {
   notices,
   organisation,
   organisations,
+  parents,
   patients,
   patientSessions,
   programmes,

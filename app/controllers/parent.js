@@ -1,9 +1,8 @@
 import wizard from '@x-govuk/govuk-prototype-wizard'
 
-import { generateChild } from '../generators/child.js'
-import { generateParent } from '../generators/parent.js'
 import { Consent } from '../models/consent.js'
 import { ProgrammeType } from '../models/programme.js'
+import { Record } from '../models/record.js'
 import { ReplyDecision, ReplyRefusal } from '../models/reply.js'
 import { School } from '../models/school.js'
 import { ConsentWindow, Session, SessionType } from '../models/session.js'
@@ -46,13 +45,12 @@ export const parentController = {
 
     // Text and email messages
     if (view === 'emails' || view === 'texts') {
-      const child = generateChild()
-      const parent = generateParent(child.lastName)
+      const record = Record.readAll(data)[0]
 
       response.locals.consent = new Consent(
         {
-          child,
-          parent,
+          child: record,
+          parent_uuid: record.parent1_uuid,
           session_id: session.id
         },
         data

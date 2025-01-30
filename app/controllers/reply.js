@@ -1,6 +1,7 @@
 import wizard from '@x-govuk/govuk-prototype-wizard'
 
 import { GillickCompetent } from '../models/gillick.js'
+import { Parent } from '../models/parent.js'
 import {
   Reply,
   ReplyDecision,
@@ -76,7 +77,7 @@ export const replyController = {
 
       // Remove any parent details in reply if self consent
       if (reply.selfConsent) {
-        delete reply.parent
+        delete reply.parent_uuid
       }
 
       if (triage?.outcome) {
@@ -189,19 +190,17 @@ export const replyController = {
     )
 
     if (Object.values(consentRefusals).length > 0) {
-      response.locals.respondentItems = consentRefusals.map(
-        ({ parent, uuid }) => ({
-          text: `${parent.fullName} (${parent.relationship})`,
-          hint: { text: parent.tel },
-          value: uuid
-        })
-      )
+      response.locals.respondentItems = consentRefusals.map(({ parent }) => ({
+        text: `${parent.fullName} (${parent.relationship})`,
+        hint: { text: parent.tel },
+        value: parent.uuid
+      }))
     } else {
       response.locals.respondentItems = patientSession.patient.parents.map(
-        (parent, index) => ({
+        (parent) => ({
           text: formatParent(parent, false),
           hint: { text: parent.tel },
-          value: `parent-${index + 1}`
+          value: parent.uuid
         })
       )
     }
@@ -223,36 +222,42 @@ export const replyController = {
   },
 
   updateForm(request, response) {
-    const { respondent } = request.body
+    const { respondent, parent } = request.body
     const { uuid } = request.params
     const { data } = request.session
     const { paths, patient, patientSession, reply, session, triage } =
       response.locals
 
     const newReply = request.body?.reply || {}
+    const newParent = new Parent({}, data)
 
     // Create parent based on choice of respondent
     if (respondent) {
       switch (respondent) {
         case 'new': // Consent response is from a new contact
-          newReply.parent = {}
+          console.log('uuid', newParent.uuid)
+          newReply.parent_uuid = newParent.uuid
           break
         case 'self':
-          newReply.parent = false
           break
         case 'parent-1': // Consent response is from CHIS record
-          newReply.parent = patient.parents[0]
+          newReply.parent_uuid = patient.parent1_uuid
           break
         case 'parent-2': // Consent response is from CHIS record
-          newReply.parent = patient.parents[1]
+          newReply.parent_uuid = patient.parent2_uuid
           break
         default: // Consent response is an existing respondent
           // Store reply that needs marked as invalid
           // We only want to do this when submitting replacement reply
           response.locals.invalidUuid = request.body.uuid
 
-          newReply.parent = Reply.read(respondent, data).parent
+          newReply.parent_uuid = Reply.read(respondent, data).parent_uuid
       }
+    }
+
+    // Create new parent
+    if (request.body.reply.parent) {
+      console.log('parent', parent)
     }
 
     // Store vaccination if refusal reason is vaccination already given
@@ -297,7 +302,7 @@ export const replyController = {
       const newReply = new Reply(
         {
           child: patient,
-          parent: reply.parent,
+          parent_uuid: reply.parent_uuid,
           patient_uuid: patient.uuid,
           session_id: session.id,
           method: ReplyMethod.Phone

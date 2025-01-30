@@ -62,7 +62,6 @@ export const ReplyRefusal = {
  * @property {string} [createdBy_uid] - User who created reply
  * @property {Date} [updatedAt] - Updated date
  * @property {import('./child.js').Child} [child] - Child
- * @property {import('./parent.js').Parent} [parent] - Parent or guardian
  * @property {ReplyDecision} [decision] - Consent decision
  * @property {boolean} [confirmed] - Decision confirmed
  * @property {boolean} given - Reply gives consent
@@ -74,6 +73,7 @@ export const ReplyRefusal = {
  * @property {string} [refusalReasonDetails] - Refusal reason details
  * @property {boolean} [selfConsent] - Reply given by child
  * @property {string} [note] - Note about this response
+ * @property {string} [parent_uuid] - Parent UUID
  * @property {string} patient_uuid - Patient UUID
  * @property {string} [programme_pid] - Programme ID
  * @property {string} session_id - Session ID
@@ -86,7 +86,6 @@ export class Reply {
     this.createdBy_uid = options?.createdBy_uid
     this.updatedAt = options?.updatedAt && new Date(options.updatedAt)
     this.child = options?.child && new Child(options.child)
-    this.parent = options?.parent && new Parent(options.parent)
     this.decision = options?.decision
     this.confirmed = stringToBoolean(options?.confirmed)
     this.given =
@@ -99,6 +98,7 @@ export class Reply {
     this.method = options?.method
     this.selfConsent = options?.selfConsent
     this.note = options?.note || ''
+    this.parent_uuid = options?.parent_uuid
     this.patient_uuid = options?.patient_uuid
     this.programme_pid = options?.programme_pid
     this.session_id = options?.session_id
@@ -186,6 +186,21 @@ export class Reply {
   }
 
   /**
+   * Get parent or guardian
+   *
+   * @returns {Parent} - Parent
+   */
+  get parent() {
+    try {
+      if (this.parent_uuid) {
+        return Parent.read(this.parent_uuid, this.context)
+      }
+    } catch (error) {
+      console.error('Reply.parent', error.message)
+    }
+  }
+
+  /**
    * Get patient
    *
    * @returns {Patient} - Patient
@@ -212,7 +227,7 @@ export class Reply {
         return Programme.read(this.programme_pid, this.context)
       }
     } catch (error) {
-      console.error('Upload.programme', error.message)
+      console.error('Reply.programme', error.message)
     }
   }
 

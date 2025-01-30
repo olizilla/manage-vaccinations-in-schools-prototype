@@ -13,6 +13,11 @@
   }) }}
 
   {{ input({
+    label: { text: "Parent UUID" },
+    decorate: "reply.parent.uuid"
+  }) }}
+
+  {{ input({
     label: { text: __("parent.fullName.label") },
     decorate: "reply.parent.fullName"
   }) if not reply.parent.fullName }}

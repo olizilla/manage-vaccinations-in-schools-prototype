@@ -11,11 +11,11 @@ import {
 /**
  * Generate fake parent
  *
- * @param {string} childLastName - Child’s last name
+ * @param {import('../models/record.js').Record} record - Child’s record
  * @param {boolean} [isMum] - Parent is child’s mother
  * @returns {Parent} - Parent
  */
-export function generateParent(childLastName, isMum) {
+export function generateParent(record, isMum) {
   // Relationship
   const relationship = isMum
     ? ParentalRelationship.Mum
@@ -31,11 +31,11 @@ export function generateParent(childLastName, isMum) {
   switch (relationship) {
     case ParentalRelationship.Mum:
       firstName = faker.person.firstName('female').replace(`'`, '’')
-      lastName = childLastName
+      lastName = record.lastName
       break
     case ParentalRelationship.Dad:
       firstName = faker.person.firstName('male').replace(`'`, '’')
-      lastName = childLastName
+      lastName = record.lastName
       break
     default:
       firstName = faker.person.firstName().replace(`'`, '’')
@@ -43,7 +43,7 @@ export function generateParent(childLastName, isMum) {
   }
 
   // Name and relationship may not be provided
-  const hasName = faker.datatype.boolean(0.9)
+  const hasName = faker.datatype.boolean(0.99)
   const hasRelationship = faker.datatype.boolean(0.7)
 
   // Contact details
@@ -89,6 +89,7 @@ export function generateParent(childLastName, isMum) {
         contactPreferenceOther:
           'Please call 01234 567890 ext 8910 between 9am and 5pm.'
       })
-    })
+    }),
+    patient_nhsn: record.nhsn
   })
 }

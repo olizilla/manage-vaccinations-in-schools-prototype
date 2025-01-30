@@ -19,8 +19,8 @@ import { Vaccination } from './vaccination.js'
  * @param {object} [context] - Context
  * @property {object} [context] - Context
  * @property {string} nhsn - NHS number
- * @property {Parent} [parent1] - Parent 1
- * @property {Parent} [parent2] - Parent 2
+ * @property {string} [parent1_uuid] - Parent 1
+ * @property {string} [parent2_uuid] - Parent 2
  * @property {Array<string>} [vaccination_uuids] - Vaccination UUIDs
  * @property {Record} [pendingChanges] - Pending changes to record values
  * @property {boolean} sensitive - Flagged as sensitive
@@ -34,10 +34,8 @@ export class Record extends Child {
     this.context = context
     this.nhsn = options?.nhsn || this.nhsNumber
     this.address = !sensitive && options?.address ? options.address : undefined
-    this.parent1 =
-      !sensitive && options?.parent1 ? new Parent(options.parent1) : undefined
-    this.parent2 =
-      !sensitive && options?.parent2 ? new Parent(options.parent2) : undefined
+    this.parent1_uuid = !sensitive ? options?.parent1_uuid : undefined
+    this.parent2_uuid = !sensitive ? options?.parent2_uuid : undefined
     this.vaccination_uuids = options?.vaccination_uuids || []
     this.pendingChanges = options?.pendingChanges || {}
     this.sensitive = sensitive
@@ -67,6 +65,36 @@ export class Record extends Child {
    */
   get hasMissingNhsNumber() {
     return !this.nhsn.match(/^\d{10}$/)
+  }
+
+  /**
+   * Get first parent or guardian
+   *
+   * @returns {Parent} - Parent
+   */
+  get parent1() {
+    try {
+      if (this.parent1_uuid) {
+        return Parent.read(this.parent1_uuid, this.context)
+      }
+    } catch (error) {
+      console.error('Record.parent1', error.message)
+    }
+  }
+
+  /**
+   * Get second parent or guardian
+   *
+   * @returns {Parent} - Parent
+   */
+  get parent2() {
+    try {
+      if (this.parent2_uuid) {
+        return Parent.read(this.parent2_uuid, this.context)
+      }
+    } catch (error) {
+      console.error('Record.parent2', error.message)
+    }
   }
 
   /**

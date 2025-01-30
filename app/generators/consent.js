@@ -5,8 +5,6 @@ import { ReplyDecision, ReplyMethod, ReplyRefusal } from '../models/reply.js'
 import { today } from '../utils/date.js'
 import { getHealthAnswers, getRefusalReason } from '../utils/reply.js'
 
-import { generateParent } from './parent.js'
-
 /**
  * Generate fake consent
  *
@@ -21,13 +19,15 @@ export function generateConsent(programme, session, patientSession, index) {
   const child = patientSession.patient
 
   // Parent
-  let parent
+  let parent_uuid
   if (index === 0) {
-    parent = patientSession.patient.parent1
-  } else if (index === 1 && patientSession.patient?.parent2) {
-    parent = patientSession.patient.parent2
+    // First parent responding
+    parent_uuid = patientSession.patient.parent1_uuid
+  } else if (index === 1 && patientSession.patient.parent2_uuid) {
+    // If second consent and second parent on record, second parent responding
+    parent_uuid = patientSession.patient.parent2_uuid
   } else {
-    parent = generateParent(patientSession.patient.lastName)
+    return
   }
 
   // Decision
@@ -59,7 +59,7 @@ export function generateConsent(programme, session, patientSession, index) {
       to: sessionClosedBeforeToday ? session.closeAt : nowAt
     }),
     child,
-    parent,
+    parent_uuid,
     decision,
     method,
     ...(decision === ReplyDecision.Given && { healthAnswers }),
