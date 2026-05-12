@@ -21,10 +21,12 @@ import {
   Vaccination
 } from '../models.js'
 import {
+  formatDate,
   getCurrentAcademicYear,
   getDateValueDifference,
   today
 } from '../utils/date.js'
+import { getScheduleSummary } from '../utils/dose-schedule.js'
 import { ordinal } from '../utils/number.js'
 import { getReportOutcome } from '../utils/patient-session.js'
 import { getPatientStatus } from '../utils/status.js'
@@ -137,7 +139,7 @@ export class PatientProgramme {
    */
   get lastPatientSession() {
     if (this.patientSessions?.length > 0) {
-      return this.patientSessions.at(-1)
+      return this.patientSessions.at(0)
     }
   }
 
@@ -288,6 +290,17 @@ export class PatientProgramme {
   }
 
   /**
+   * Get canonical vaccination outcomes (excluding duplicates)
+   *
+   * @returns {Array<import('./vaccination.js').Vaccination>|undefined} Vaccinations
+   */
+  get canonicalVaccinationOutcomes() {
+    return this.vaccinationOutcomes?.filter(
+      (vaccination) => !vaccination.canonicalVaccination_uuid
+    )
+  }
+
+  /**
    * Get last vaccination outcome
    *
    * @returns {import('./vaccination.js').Vaccination|undefined} Vaccination
@@ -362,11 +375,36 @@ export class PatientProgramme {
    * @returns {number} Doses remaining
    */
   get dosesRemaining() {
-    if (this.vaccinationsGiven?.length > 0) {
-      return this.dosesNeeded - this.vaccinationsGiven?.length
+    const validCount = this.scheduleSummary.dosesComplete
+    if (validCount > 0) {
+      return this.dosesNeeded - validCount
     }
 
     return this.dosesNeeded
+  }
+
+  /**
+   * Get dose schedule summary
+   *
+   * @returns {object} Schedule summary
+   */
+  get scheduleSummary() {
+    const canonicalGiven = (this.vaccinationsGiven || []).filter(
+      (vaccination) => !vaccination.canonicalVaccination_uuid
+    )
+    const summary = getScheduleSummary({
+      vaccinationsGiven: canonicalGiven,
+      dob: this.patient?.dob,
+      programme: this.programme
+    })
+    return {
+      ...summary,
+      dosesComplete: summary.validDoses.length,
+      dosesNeeded: this.dosesNeeded,
+      nextEligibleFromFormatted: summary.nextEligibleFrom
+        ? formatDate(summary.nextEligibleFrom, { dateStyle: 'long' })
+        : null
+    }
   }
 
   /**
