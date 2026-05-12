@@ -48,6 +48,20 @@ export const vaccinationController = {
     response.render('vaccination/show')
   },
 
+  duplicates(request, response) {
+    const { vaccination } = response.locals
+
+    if (!vaccination) {
+      return response.redirect('/')
+    }
+
+    if (vaccination.canonicalVaccination_uuid || !vaccination.duplicates.length) {
+      return response.redirect(vaccination.uri)
+    }
+
+    response.render('vaccination/duplicates')
+  },
+
   edit(request, response) {
     const { vaccination_uuid } = request.params
     const { data, referrer } = request.session

@@ -1579,6 +1579,22 @@ export const en = {
       count:
         '{count, plural, =0 {No vaccination record} one {Vaccination record} other {# vaccination records}}'
     },
+    encounters: {
+      count:
+        '{count, plural, =0 {No encounters recorded} one {Encounters} other {# encounters}}'
+    },
+    vaccinationRecord: {
+      label: 'Vaccination record',
+      dosesComplete: '{complete} of {needed} doses complete.',
+      dose: {
+        label: 'Dose',
+        number: 'Dose {sequence}'
+      },
+      ignored: {
+        label: 'Out of schedule'
+      },
+      eligibleFrom: 'Eligible from {date}'
+    },
     status: {
       label: 'Status'
     },
@@ -3148,6 +3164,7 @@ export const en = {
     show: {
       summary: 'Vaccination record'
     },
+    reportProblem: 'Report a problem with this duplicate record',
     count:
       '{count, plural, =0 {No vaccination records} one {1 vaccination record} other {# vaccination records}}',
     administer: {
@@ -3260,6 +3277,9 @@ export const en = {
     countryOther: {
       title: 'Which country was the vaccination given in?'
     },
+    schedule: {
+      label: 'Schedule'
+    },
     outcome: {
       label: 'Outcome',
       title: 'Vaccination outcome',
@@ -3302,6 +3322,28 @@ export const en = {
     },
     source: {
       label: 'Source'
+    },
+    duplicates: {
+      count:
+        '{count, plural, =0 {} one {+# duplicate} other {+# duplicates}}',
+      canonical: {
+        heading: 'Canonical record'
+      },
+      reportProblem: 'Report a problem with this duplicate set',
+      list: {
+        heading:
+          '{count, plural, one {# duplicate record} other {# duplicate records}}'
+      }
+    },
+    canonicalRole: {
+      label: 'Canonical record',
+      yes: 'Yes',
+      no: 'No',
+      view: 'View canonical record'
+    },
+    duplicateRecords: {
+      label: 'Duplicate records',
+      count: '{count, plural, one {# record} other {# records}}'
     },
     ttcv: {
       label: 'Dose'
