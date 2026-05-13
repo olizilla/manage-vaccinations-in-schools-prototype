@@ -270,6 +270,7 @@ export class Reply {
    */
   get healthQuestionsForDecision() {
     const { Flu, HPV, MenACWY, TdIPV } = ProgrammeType
+    if (!this.session) return {}
     const programme = this.session.programmes[0]
 
     const healthQuestionsForDecision = new Map()
