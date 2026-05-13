@@ -1581,7 +1581,8 @@ export const en = {
     },
     encounters: {
       count:
-        '{count, plural, =0 {No encounters recorded} one {Encounters} other {# encounters}}'
+        '{count, plural, =0 {No encounters recorded} one {Encounters} other {# encounters}}',
+      date: { label: 'Encounter date' }
     },
     vaccinationRecord: {
       label: 'Vaccination record',
